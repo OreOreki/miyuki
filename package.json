@@ -1,0 +1,30 @@
+{
+  "name": "miyuki",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "node build.cjs",
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@cloudflare/ai": "^1.0.41",
+    "bad-words": "^3.0.4",
+    "yor.ts": "^0.0.6"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.4.5",
+    "@cloudflare/workers-types": "^4.20231121.0",
+    "@types/bad-words": "^3.0.3",
+    "esbuild": "^0.19.9",
+    "esbuild-plugin-polyfill-node": "^0.3.0",
+    "eslint": "^8.55.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.20.0"
+  }
+}

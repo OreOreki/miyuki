@@ -1,0 +1,13 @@
+name = "name"
+main = "dist/index.js"
+compatibility_date = "2023-12-06"
+
+[vars]
+APPLICATION_ID = "APPLICATION_ID"
+APPLICATION_PUBLIC_KEY = "APPLICATION_PUBLIC_KEY"
+TOKEN = "TOKEN"
+
+[ai]
+binding = "AI"
+
+kv_namespaces = [ { binding = "KV", id = "ID" } ]
