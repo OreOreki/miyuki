@@ -1,0 +1,30 @@
+export interface NekosAPIResponse {
+  id: number
+  id_v2: string
+  image_url: string
+  sample_url: string
+  image_size: number
+  image_width: number
+  image_height: number
+  sample_size: number
+  sample_width: number
+  sample_height: number
+  source: string
+  source_id: any
+  rating: string
+  verification: string
+  hash_md5: string
+  hash_perceptual: string
+  color_dominant: number[]
+  color_palette: number[][]
+  duration: any
+  is_original: boolean
+  is_screenshot: boolean
+  is_flagged: boolean
+  is_animated: boolean
+  artist: any
+  characters: any[]
+  tags: any[]
+  created_at: number
+  updated_at: number
+}

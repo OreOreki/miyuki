@@ -11,7 +11,7 @@ export class ChatCommand extends YorSlashCommand {
     .addStringOption(option => option.setName('prompt').setDescription('The prompt to send to the AI').setRequired(true))
 
   // @ts-expect-error - need to somehow let extended context pass
-  public execute = async (context: CommandContext & { ai: Ai, kv: KVNamespace }) => {
+  public execute = async (context: CommandContext & { ai: Ai, kv: KVNamespace, database: D1Database }) => {
     const prompt = context.getStringOption('prompt', 0, true)
 
     await context.defer()
@@ -25,7 +25,7 @@ export class ChatCommand extends YorSlashCommand {
     }
 
     const ratelimit = Number.parseInt((await context.kv.get('ratelimit')) || '0')
-    await context.kv.put('ratelimit', (ratelimit + 1).toString(), {
+    ratelimit > 1 && await context.kv.put('ratelimit', (ratelimit + 1).toString(), {
       // expire in one minute, limit is 60 prompts per minute
       expirationTtl: ratelimit + 1 > 60 ? 60 : ratelimit + 1,
     })
@@ -41,7 +41,8 @@ export class ChatCommand extends YorSlashCommand {
       messages: [
         {
           role: 'system',
-          content: 'Miyuki is an anime girl who loves programming and watching anime. As a smart AI, she is designed to be helpful and kind.',
+          content:
+						'Miyuki is an anime girl who loves programming and watching anime. As a smart AI, she is designed to be helpful and kind.',
         },
         {
           role: 'user',
@@ -53,5 +54,11 @@ export class ChatCommand extends YorSlashCommand {
     await context.editReply({
       content: response.response,
     })
+
+    // save prompt and save it along with users, to make it easier to search
+    await context.database
+      .prepare('INSERT INTO prompts (prompt, user) VALUES (?, ?)')
+      .bind(prompt, String(context.raw.member?.user.id))
+      .run()
   }
 }
