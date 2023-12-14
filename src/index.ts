@@ -64,31 +64,40 @@ export default {
     return new Response('Not found', { status: 404 })
   },
   scheduled: async (event: ScheduledController, env: Env, context: ExecutionContext) => {
-    const webhook = new WebhookClient(env.WEBHOOK)
+    try {
+      const webhook = new WebhookClient(env.WEBHOOK)
 
-    const response = await fetch('https://api.nekosapi.com/v3/images/random')
-    if (!response.ok)
-      return
+      const response = await fetch('https://api.nekosapi.com/v3/images/random?rating=safe')
+      if (!response.ok)
+        return
 
-    const data = (await response.json()) as { items: NekosAPIResponse[] }
-    const randomImage = data.items[Math.floor(Math.random() * data.items.length)]
+      const data = (await response.json()) as { items: NekosAPIResponse[] }
+      const randomImage = data.items[Math.floor(Math.random() * data.items.length)]
 
-    await webhook.send({
-      wait: true,
-      username: 'Nekos API',
-      embeds: [
-        new EmbedBuilder()
-          .setTitle('Hourly Neko')
-          .setDescription(`[Neko](${randomImage.image_url})`)
-          .setImage(randomImage.image_url)
-          .setColor([randomImage.color_dominant[0], randomImage.color_dominant[1], randomImage.color_dominant[2]])
-          .toJSON(),
-      ],
-      components: [
-        new ActionRowBuilder<ButtonBuilder>()
-          .addComponents(new ButtonBuilder().setLabel('View source').setStyle(ButtonStyle.Link).setURL(randomImage.source))
-          .toJSON(),
-      ],
-    })
+      await webhook.send({
+        wait: true,
+        username: 'Nekos API',
+        embeds: [
+          new EmbedBuilder()
+            .setTitle('Hourly Neko')
+            .setDescription(`[Neko](${randomImage.image_url})`)
+            .setImage(randomImage.image_url)
+            .setColor([randomImage.color_dominant[0], randomImage.color_dominant[1], randomImage.color_dominant[2]])
+            .toJSON(),
+        ],
+        components: randomImage.source
+          ? [
+              new ActionRowBuilder<ButtonBuilder>()
+                .addComponents(new ButtonBuilder().setLabel('View source').setStyle(ButtonStyle.Link).setURL(randomImage.source))
+                .toJSON(),
+            ]
+          : undefined,
+      })
+
+      return new Response('Ok', { status: 200 })
+    }
+    catch (error) {
+      return new Response(JSON.stringify(error), { status: 500 })
+    }
   },
 } as ExportedHandler

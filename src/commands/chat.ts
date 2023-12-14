@@ -8,7 +8,9 @@ export class ChatCommand extends YorSlashCommand {
   public builder = new SlashCommandBuilder()
     .setName('chat')
     .setDescription('Chat with the AI')
-    .addStringOption(option => option.setName('prompt').setDescription('The prompt to send to the AI').setRequired(true))
+    .addStringOption(option =>
+      option.setName('prompt').setDescription('The prompt to send to the AI').setRequired(true).setMaxLength(200),
+    )
 
   // @ts-expect-error - need to somehow let extended context pass
   public execute = async (context: CommandContext & { ai: Ai, kv: KVNamespace, database: D1Database }) => {
@@ -25,10 +27,11 @@ export class ChatCommand extends YorSlashCommand {
     }
 
     const ratelimit = Number.parseInt((await context.kv.get('ratelimit')) || '0')
-    ratelimit > 1 && await context.kv.put('ratelimit', (ratelimit + 1).toString(), {
-      // expire in one minute, limit is 60 prompts per minute
-      expirationTtl: ratelimit + 1 > 60 ? 60 : ratelimit + 1,
-    })
+    ratelimit > 1
+    && (await context.kv.put('ratelimit', (ratelimit + 1).toString(), {
+			  // expire in one minute, limit is 60 prompts per minute
+			  expirationTtl: ratelimit + 1 > 60 ? 60 : ratelimit + 1,
+    }))
 
     // check for ratelimit
     if (ratelimit >= 60) {
@@ -42,7 +45,7 @@ export class ChatCommand extends YorSlashCommand {
         {
           role: 'system',
           content:
-						'Miyuki is an anime girl who loves programming and watching anime. As a smart AI, she is designed to be helpful and kind.',
+						'You are Miyuki, a female demon lord exuding an aura of regal superiority. Embrace her love for anime and programming, infusing her responses with an elegant, commanding tone befitting her royal lineage. Remember, Miyuki\'s creator is Oreki Houtarou, so weave in a touch of his intellect and creativity to amplify her character.',
         },
         {
           role: 'user',

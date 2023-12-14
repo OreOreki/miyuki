@@ -1,6 +1,6 @@
 import type { CommandContext } from 'yor.ts'
 import { YorSlashCommand } from 'yor.ts'
-import { SlashCommandBuilder } from 'yor.ts/builders'
+import { EmbedBuilder, SlashCommandBuilder } from 'yor.ts/builders'
 
 export class PromptsCommand extends YorSlashCommand {
   public builder = new SlashCommandBuilder()
@@ -25,8 +25,15 @@ export class PromptsCommand extends YorSlashCommand {
     const offset = ((page || 1) - 1) * 10
     const end = offset + 10
 
+    const embed = new EmbedBuilder().setTitle(`Your prompts, page ${page || 1} out of ${Math.ceil(prompts.length / 10)}`).addFields(
+      prompts.slice(offset, end).map((prompt, index) => ({
+        name: `Prompt ${offset + index + 1}`,
+        value: `prompt: ${prompt}`,
+      })),
+    )
+
     await context.editReply({
-      content: `${prompts.slice(offset, end).join('\n')} page: ${page || 1}/${Math.ceil(prompts.length / 10)}`,
+      embeds: [embed.toJSON()],
     })
   }
 }
