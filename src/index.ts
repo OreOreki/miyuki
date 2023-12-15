@@ -80,9 +80,11 @@ export default {
         embeds: [
           new EmbedBuilder()
             .setTitle('Hourly Neko')
-            .setDescription(`[Neko](${randomImage.image_url})`)
+            .setDescription(`Id: ${randomImage.id}\n[Neko](${randomImage.image_url})`)
             .setImage(randomImage.image_url)
             .setColor([randomImage.color_dominant[0], randomImage.color_dominant[1], randomImage.color_dominant[2]])
+            .setFooter({ text: `Made using yor.ts` })
+            .setTimestamp()
             .toJSON(),
         ],
         components: randomImage.source
